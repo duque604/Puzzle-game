@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css"/>
+    <title></title>
+</head>
+<body>
+<div id="ventana" >
+    <div id="juego1" class="divtipodejuego">
+        <img id="icono1" src="img/iconojugador.png" alt=""/>
+        <img id="vs1" src="img/vs.png" alt=""/>
+        <img id="icono2" src="img/iconocomputadora.png" alt=""/>
+    </div>
+    <div id="juego2" class="divtipodejuego">
+        <img id="icono3" src="img/iconojugador.png" alt=""/>
+        <img id="vs2" src="img/vs.png" alt=""/>
+        <img id="icono4" src="img/iconojugador.png" alt=""/>
+    </div>
+    <img id="jugador1ico" src="img/iconojugador.png" alt=""/>
+    <img id="botonok1" src="img/boton-ok.png" alt=""/>
+    <img id="jugador2ico" src="img/iconojugador.png" alt=""/>
+    <img id="botonok2" src="img/boton-ok.png" alt=""/>
+    <img id="pcico" src="img/iconocomputadora.png" alt=""/>
+</div>
+
+<script>
+    var  ventana = document.getElementById("ventana");
+
+    var  juego1 = document.getElementById("juego1");
+    var  juego2 = document.getElementById("juego2");
+
+    var icono1 = document.getElementById("icono1");
+    var icono2 = document.getElementById("icono2");
+    var icono3 = document.getElementById("icono3");
+    var icono4 = document.getElementById("icono4");
+
+    var jugador1ico = document.getElementById("jugador1ico");
+    var jugador2ico = document.getElementById("jugador2ico");
+    var pcico = document.getElementById("pcico");
+    var botonok1 = document.getElementById("botonok1");
+    var botonok2 = document.getElementById("botonok2");
+
+    var fos = [];
+    var contador_turno = 0;
+    var contador_movimientos = 0;
+    var movimientos_anterior = 0;
+    var contador_orden = 0;
+    var tipodejuego = 0;
+
+    juego1.onclick=function(){
+        if(tipodejuego==1){}
+        juego1.style.display = "none";
+        juego2.style.display = "none";
+        tipodejuego=1;
+        iniciar();
+    };
+    juego2.onclick=function(){
+        juego1.style.display = "none";
+        juego2.style.display = "none";
+        tipodejuego=2;
+        iniciar();
+    };
+
+    botonok1.onclick=function(){
+
+        if(contador_movimientos<1){
+            alert("Deber retirar algun fosforo");
+        }
+        else{
+            if(tipodejuego==1){
+                contador_turno +=1;
+                movimientos_anterior = contador_movimientos;
+                contador_movimientos=0;
+                arbitro();
+                //ampliar(1);
+            }
+            if(tipodejuego==2){
+                contador_turno +=1;
+                movimientos_anterior = contador_movimientos;
+                contador_movimientos=0;
+                ampliar(1);
+            }
+
+        }
+
+    };
+    botonok2.onclick=function(){
+
+        if(contador_movimientos<1){
+            alert("Deber retirar algun fosforo");
+        }
+        else{
+            contador_turno +=1;
+            movimientos_anterior = contador_movimientos;
+            contador_movimientos=0;
+            ampliar(2);
+        }
+
+    };
+    function iniciar(juego){
+        var mesa = document.createElement("div");
+        mesa.id="mesa";
+        var a =[];
+        for (var i= 0;i<11;i++){
+            a[i] = document.createElement('img');
+            a[i].src = "img/fosforo1.png";
+            a[i].style.width = "50px";
+            a[i].style.height = "100px";
+            fos[i] = document.createElement('div');
+            fos[i].indice = i;
+            fos[i].style.position = "absolute";
+            fos[i].style.height = "100px";
+            fos[i].style.width = "50px";
+            fos[i].style.left = (60*i)+'px';
+            fos[i].onclick = function(){
+
+                    arbitro(this.indice);
+            };
+            fos[i].appendChild(a[i]);
+            mesa.appendChild(fos[i]);
+
+            
+        }
+        ventana.appendChild(mesa);
+        if(tipodejuego == 1){
+            jugador1ico.style.display="block";
+            pcico.style.display="block";
+        }
+
+
+        arbitro();
+
+    }
+    function arbitro(indice){
+        if(indice > contador_orden){
+            alert("Debe retirar en orden los fosforos");
+        }
+        else {
+            if (tipodejuego == 1) {
+
+                switch (contador_turno) {
+                    case 0 :
+                        ampliar(1);
+                        var intervalo1 = setTimeout("retirar(1)", 500);
+                        var intervalo2 = setTimeout("retirar(1)", 1000);
+                        var intervalo3 = setTimeout("ampliar(2)", 1100);
+                        contador_turno += 1;
+
+                        break;
+
+                    case 1 :
+                        ampliar(2);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_turno += 1;
+                                arbitro();
+                            }
+                        }
+                        break;
+
+                    case 2 :
+                        ampliar(1)
+                        var cant = 4 - movimientos_anterior;
+                        for (var i = 0; i < cant; i++) {
+                            var a = setTimeout("retirar(1)", (i + 1) * 500);
+                            if (i == (cant - 1)) {
+                                var b = setTimeout("ampliar(2)", ((i + 1) * 500) + 100);
+                            }
+                        }
+                        contador_movimientos = 0;
+                        contador_turno += 1;
+                        break;
+
+                    case 3 :
+                        ampliar(2)
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_turno += 1;
+                                arbitro();
+                            }
+                        }
+                        break;
+
+                    case 4 :
+                        ampliar(1)
+                        var cant = 4 - movimientos_anterior;
+                        for (var i = 0; i < cant; i++) {
+                            var a = setTimeout("retirar(1)", (i + 1) * 500);
+                            if (i == (cant - 1)) {
+                                var b = setTimeout("ampliar(2)", ((i + 1) * 500) + 100);
+                                var c = setTimeout(function () {
+                                    alert("Perdiste");
+                                    final();
+                                }, ((i + 1) * 500) + 100);
+                            }
+                        }
+                        break;
+                }
+            }
+            if (tipodejuego == 2) {
+                switch (contador_turno) {
+                    case 0:
+                        console.log("contador de orde = "+ contador_orden)
+                    ampliar(1);
+                    contador_orden += 1;
+                    if (contador_movimientos == 4) {
+                        alert("No tienes mas movimientos");;
+                    } else {
+                        fos[indice].style.display = "none";
+                        contador_movimientos += 1;
+
+                        if (contador_movimientos == 3) {
+                            movimientos_anterior = 3;
+                            contador_movimientos=0;
+                            contador_turno += 1;
+                            ampliar(2);
+                        }
+                    }
+                    break;
+                    case 1:
+                        console.log("contador de orde = "+ contador_orden)
+                        ampliar(2);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");;
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_movimientos=0;
+                                contador_turno += 1;
+                                ampliar(1)
+                            }
+                        }
+                        break;
+                    case 2:
+                        console.log("contador de orde = "+ contador_orden)
+                        ampliar(1);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_movimientos=0;
+                                contador_turno += 1;
+                                ampliar(2);
+                            }
+                        }
+                        break;
+                    case 3:
+                        console.log("contador de orde = "+ contador_orden);
+                        ampliar(2);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");;
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if(contador_orden==11){
+                                ampliar(1);
+                                alert("Perdiste");
+                                final();
+                            }
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_movimientos=0;
+                                contador_turno += 1;
+                                ampliar(1);
+                            }
+                        }
+                        break;
+                    case 4:
+                        console.log("contador de orde = "+ contador_orden)
+                        ampliar(1);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");;
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if(contador_orden==11){
+                                ampliar(2);
+                                alert("Perdiste");
+                                final();
+                            }
+
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_movimientos=0;
+                                contador_turno += 1;
+                                ampliar(2);
+                            }
+                        }
+                        break;
+                    case 5:
+                            console.log("contador de orde = "+ contador_orden)
+                        ampliar(2);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");;
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if(contador_orden==11){
+                                ampliar(1);
+                                alert("Perdiste");
+                                final();
+                            }
+
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_movimientos=0;
+                                contador_turno += 1;
+                                ampliar(1);
+                            }
+                        }
+                        break;
+                    case 6:
+                        console.log("contador de orde = "+ contador_orden)
+                        ampliar(1);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if(contador_orden==11){
+                                ampliar(2);
+                                alert("Perdiste");
+                                final();
+                            }
+
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_movimientos=0;
+                                contador_turno += 1;
+                                ampliar(2);
+                            }
+                        }
+                        break;
+                    case 7:
+                        console.log("contador de orde = "+ contador_orden)
+                        ampliar(2);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if(contador_orden==11){
+                                ampliar(1);
+                                alert("Perdiste");
+                                final();
+                            }
+
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_movimientos=0;
+                                contador_turno += 1;
+                                ampliar(1);
+                            }
+                        }
+                        break;
+                    case 8:
+                        console.log("contador de orde = "+ contador_orden)
+                        ampliar(1);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if(contador_orden==11){
+                                ampliar(2);
+                                alert("Perdiste");
+                                final();
+                            }
+
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_movimientos=0;
+                                contador_turno += 1;
+                                ampliar(2);
+                            }
+                        }
+                        break;
+                    case 9:
+                        console.log("contador de orde = "+ contador_orden)
+                        ampliar(2);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if(contador_orden==11){
+                                ampliar(1);
+                                alert("Perdiste");
+                                final();
+                            }
+
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_movimientos=0;
+                                contador_turno += 1;
+                                ampliar(1);
+                            }
+                        }
+                        break;
+                    case 10:
+                        console.log("contador de orde = "+ contador_orden)
+                        ampliar(1);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if(contador_orden==11){
+                                ampliar(2);
+                                alert("Perdiste");
+                                final();
+                            }
+
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_movimientos=0;
+                                contador_turno += 1;
+                                ampliar(2);
+                            }
+                        }
+                        break;
+                    case 11:
+                        console.log("contador de orde = "+ contador_orden)
+                        ampliar(2);
+                        contador_orden += 1;
+                        if (contador_movimientos == 4) {
+                            alert("No tienes mas movimientos");
+                        } else {
+                            fos[indice].style.display = "none";
+                            contador_movimientos += 1;
+
+                            if(contador_orden==11){
+                                ampliar(1);
+                                alert("Perdiste");
+                                final();
+                            }
+
+                            if (contador_movimientos == 3) {
+                                movimientos_anterior = 3;
+                                contador_movimientos=0;
+                                contador_turno += 1;
+                                ampliar(1);
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    function retirar(cantidad){
+        var temp = contador_orden + cantidad;
+        console.log("temp "+temp);
+        for(var i = contador_orden;i<temp;i++){
+            contador_orden += 1;
+            fos[i].style.display = "none";
+        }
+    }
+
+    function ampliar(jugador){
+        if(tipodejuego==1){
+            if(jugador==1){
+                jugador1ico.style.display = "none";
+                botonok1.style.display = "none";
+                pcico.style.display='block';
+            }
+            if(jugador==2){
+                jugador1ico.style.display = "block";
+                botonok1.style.display = "block";
+                pcico.style.display='none';
+            }
+        }
+        if(tipodejuego==2){
+            if(jugador==1){
+                jugador1ico.style.display = "none";
+                botonok1.style.display = "none";
+                jugador2ico.style.display='block';
+                botonok2.style.display = "block";
+            }
+            if(jugador==2){
+                jugador1ico.style.display = "block";
+                botonok1.style.display = "block";
+                jugador2ico.style.display='none';
+                botonok2.style.display = "none";
+            }
+        }
+
+    }
+    function final(){
+        jugador1ico.style.display = "none";
+        botonok1.style.display = "none";
+        jugador2ico.style.display='none';
+        botonok2.style.display = "none";
+        pcico.style.display='none';
+        for(var i = 0;i<11;i++){
+            fos[i].style.display = "none";
+        }
+        juego1.style.display = "block";
+        juego2.style.display = "block";
+        contador_turno = 0;
+        contador_movimientos = 0;
+        movimientos_anterior = 0;
+        contador_orden = 0;
+        tipodejuego = 0;
+    }
+
+</script>
+</body>
+</html>
